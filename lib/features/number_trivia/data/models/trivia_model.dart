@@ -31,7 +31,10 @@ class TriviaModel extends Trivia {
   factory TriviaModel.fromMap(Map<String, dynamic> map) {
     return TriviaModel(
       text: map['text'] as String,
-      number: (map['number'] as double).toInt(),
+      number:
+          (map['number'] is double)
+              ? (map['number'] as double).toInt()
+              : map['number'] as int,
       found: map['found'] as bool,
       type: map['type'] as String,
     );
