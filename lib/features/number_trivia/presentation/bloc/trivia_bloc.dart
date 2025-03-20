@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:clean_tdd_trivian/core/usecases/usecase.dart';
 import 'package:clean_tdd_trivian/core/utils/input_converter.dart';
 import 'package:clean_tdd_trivian/features/number_trivia/domain/usecases/get_random_trivian.dart';
@@ -30,21 +32,55 @@ class TriviaBloc extends Bloc<TriviaEvent, TriviaState> {
     Emitter<TriviaState> emit,
   ) async {
     final integer = _inputConverter.convertStringToInteger(event.number);
-
-    integer.fold(
-      (l) => emit(TriviaFailure(message: l.message, statusCode: l.statusCode)),
+    emit(TriviaLoading());
+    await integer.fold(
+      (l) async =>
+          emit(TriviaFailure(message: l.message, statusCode: l.statusCode)),
       (r) async {
-        emit(TriviaLoading());
         final res = await _getTriviaForNumber(TrivianParams(number: r));
 
         res.fold(
-          (l) =>
-              emit(TriviaFailure(message: l.message, statusCode: l.statusCode)),
-          (r) => emit(TriviaSucess(trivia: r)),
+          (l) {
+            log("API Failure: ${l.message}");
+            emit(TriviaFailure(message: l.message, statusCode: l.statusCode));
+          },
+          (r) {
+            log("API Success: ${r.text}");
+            emit(TriviaSucess(trivia: r)); // Correct Success State
+            log("TriviaSuccess Emitted");
+          },
         );
       },
     );
   }
+
+  // Future<void> _getTriviaForNumberHandler(
+  //   GetTriviaForNumber event,
+  //   Emitter<TriviaState> emit,
+  // ) async {
+  //   final integer = _inputConverter.convertStringToInteger(event.number);
+
+  //   emit(TriviaLoading());
+
+  //   await integer.fold(
+  //     (l) async =>
+  //         emit(TriviaFailure(message: l.message, statusCode: l.statusCode)),
+  //     (r) async {
+  //       final res = await _getTriviaForNumber(TrivianParams(number: r));
+  //        res.fold(
+  //         (l) {
+  //           log("API Failure: ${l.message}");
+  //           emit(TriviaFailure(message: l.message, statusCode: l.statusCode));
+  //         },
+  //         (r) {
+  //           log("API Success: ${r.text}");
+  //           emit(TriviaSucess(trivia: r));
+  //           log("TriviaSuccess Emitted");
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   Future<void> _getTriviaForRandomHandler(
     GetTriviaForRandom event,

@@ -11,8 +11,9 @@ class GetTriviaWithNumber implements UseCase<Trivia, TrivianParams> {
   GetTriviaWithNumber({required this.repository});
 
   @override
-  Future<Either<Failure, Trivia>> call(TrivianParams params) =>
-      repository.getTriviaWithNumber(number: params.number);
+  Future<Either<Failure, Trivia>> call(TrivianParams params) {
+    return repository.getTriviaWithNumber(number: params.number);
+  }
 }
 
 class TrivianParams extends Equatable {

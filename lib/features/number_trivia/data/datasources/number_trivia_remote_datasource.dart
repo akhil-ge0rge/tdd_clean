@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:clean_tdd_trivian/core/error/exceptions.dart';
 import 'package:clean_tdd_trivian/core/error/failure.dart';
 import 'package:clean_tdd_trivian/features/number_trivia/data/models/trivia_model.dart';
@@ -15,7 +17,7 @@ class NumberTriviaRemoteDatasourceImpl implements NumberTriviaRemoteDatasource {
 
   @override
   Future<TriviaModel> getTriviaWithNumber({required int number}) async =>
-      _getTriviaModel('http://numbersapi.com/$number');
+      _getTriviaModel('http://numbersapi.com/$number?json');
 
   @override
   Future<TriviaModel> getTriviaRandom() async =>
@@ -27,6 +29,7 @@ class NumberTriviaRemoteDatasourceImpl implements NumberTriviaRemoteDatasource {
       headers: {'Content-Type': 'application/json'},
     );
     if (response.statusCode == 200) {
+      log(response.body);
       final tModel = TriviaModel.fromJson(response.body);
       return tModel;
     } else {
